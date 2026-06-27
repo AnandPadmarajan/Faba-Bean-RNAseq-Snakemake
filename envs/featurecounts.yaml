@@ -1,0 +1,7 @@
+name: featurecounts
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  # v2.1.1+ avoids the segfault issue seen with earlier subread releases
+  - subread=2.1.1

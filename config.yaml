@@ -1,0 +1,56 @@
+# =============================================================================
+# Pipeline configuration
+# =============================================================================
+# This config drives the Snakemake pipeline. By default it points at the tiny
+# public S. cerevisiae test dataset from nf-core/test-datasets (rnaseq branch),
+# so the entire pipeline can be cloned and run end-to-end on a laptop in
+# minutes, with no special data access required.
+#
+# To run on your own data (e.g. a real Vicia faba dataset), just point the
+# paths below at your own FASTQ files, genome, and annotation, and update the
+# `samples` table below + `design_formula` to match your experiment.
+# =============================================================================
+
+# --- Reference files ---
+genome_fasta: "test_data/reference/genome.fa"
+genome_gtf: "test_data/reference/genes.gtf"
+hisat2_index_prefix: "results/00_index/genome_index"
+
+# --- Output directory ---
+results_dir: "results"
+
+# --- Samples ---
+# sample: unique sample name
+# condition: experimental group (e.g. control / stress)
+# fastq_1 / fastq_2: paths to paired-end reads (leave fastq_2 blank for single-end)
+samples:
+  ctrl_rep1:
+    condition: control
+    fastq_1: "test_data/reads/ctrl_rep1_R1.fastq.gz"
+    fastq_2: "test_data/reads/ctrl_rep1_R2.fastq.gz"
+  ctrl_rep2:
+    condition: control
+    fastq_1: "test_data/reads/ctrl_rep2_R1.fastq.gz"
+    fastq_2: "test_data/reads/ctrl_rep2_R2.fastq.gz"
+  stress_rep1:
+    condition: stress
+    fastq_1: "test_data/reads/stress_rep1_R1.fastq.gz"
+    fastq_2: "test_data/reads/stress_rep1_R2.fastq.gz"
+  stress_rep2:
+    condition: stress
+    fastq_1: "test_data/reads/stress_rep2_R1.fastq.gz"
+    fastq_2: "test_data/reads/stress_rep2_R2.fastq.gz"
+
+# --- DESeq2 design ---
+# Mirrors the design rationale used in the original coursework pipeline:
+# a simple additive model is preferred over an interaction term unless
+# there is a specific hypothesis about genotype-by-treatment interaction.
+design_formula: "~condition"
+contrast: ["condition", "stress", "control"]
+padj_threshold: 0.05
+
+# --- WGCNA parameters ---
+wgcna:
+  min_module_size: 30
+  merge_cut_height: 0.25
+  soft_power: 6   # placeholder - pipeline includes a step to pick this properly via pickSoftThreshold

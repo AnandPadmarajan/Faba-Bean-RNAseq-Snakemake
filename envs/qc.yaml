@@ -1,0 +1,8 @@
+name: qc
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - fastqc=0.12.1
+  - trim-galore=0.6.10
+  - multiqc=1.21

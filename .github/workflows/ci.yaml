@@ -1,0 +1,57 @@
+name: Pipeline CI
+
+# Runs the full pipeline end-to-end on the small public test dataset on every
+# push and pull request. This is the single most convincing piece of evidence
+# that the pipeline is actually reproducible -- anyone can see it pass (or
+# fail) on a clean machine, not just on the author's laptop.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  run-pipeline:
+    runs-on: ubuntu-latest
+    # Bioconductor environment creation (DESeq2, WGCNA) can be slow on cold
+    # caches. Generous timeout avoids a misleading "stuck" run; if this is
+    # regularly exceeded, consider pre-building a container image instead of
+    # per-rule conda envs (see README "Future improvements").
+    timeout-minutes: 45
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Miniforge (conda + mamba)
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          miniforge-version: latest
+          activate-environment: snakemake
+          channels: conda-forge,bioconda
+
+      - name: Cache conda environments
+        uses: actions/cache@v4
+        with:
+          path: ~/.snakemake/conda
+          key: ${{ runner.os }}-snakemake-envs-${{ hashFiles('envs/*.yaml') }}
+
+      - name: Install Snakemake
+        run: mamba install -n snakemake -c conda-forge -c bioconda snakemake-minimal -y
+
+      - name: Fetch test dataset
+        run: bash scripts/fetch_test_data.sh
+
+      - name: Dry-run pipeline (validate DAG)
+        run: snakemake -n -p
+
+      - name: Run pipeline end-to-end
+        run: snakemake --cores 2 --use-conda --conda-frontend mamba
+
+      - name: Upload results as artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pipeline-results
+          path: results/
+          retention-days: 7

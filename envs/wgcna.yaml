@@ -1,0 +1,8 @@
+name: wgcna
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - r-base=4.3
+  - r-wgcna=1.73
+  - r-tidyverse=2.0.0
