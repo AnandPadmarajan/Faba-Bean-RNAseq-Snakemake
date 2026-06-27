@@ -1,3 +1,5 @@
+![Pipeline CI](https://github.com/AnandPadmarajan/Faba-Bean-RNAseq-Snakemake/actions/workflows/ci.yaml/badge.svg)
+
 # Faba Bean RNA-seq + WGCNA Pipeline (Snakemake)
 
 A reproducible Snakemake re-implementation of an RNA-seq differential
