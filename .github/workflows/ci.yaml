@@ -31,7 +31,7 @@ jobs:
           key: ${{ runner.os }}-snakemake-envs-${{ hashFiles('envs/*.yaml') }}
 
       - name: Install Snakemake
-        run: mamba install -n snakemake -c conda-forge -c bioconda snakemake-minimal -y
+        run: mamba install -n snakemake -c conda-forge -c bioconda snakemake-minimal pandas -y
 
       - name: Fetch test dataset
         run: bash scripts/fetch_test_data.sh
