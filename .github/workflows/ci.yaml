@@ -1,10 +1,5 @@
 name: Pipeline CI
 
-# Runs the full pipeline end-to-end on the small public test dataset on every
-# push and pull request. This is the single most convincing piece of evidence
-# that the pipeline is actually reproducible -- anyone can see it pass (or
-# fail) on a clean machine, not just on the author's laptop.
-
 on:
   push:
     branches: [main]
@@ -14,11 +9,10 @@ on:
 jobs:
   run-pipeline:
     runs-on: ubuntu-latest
-    # Bioconductor environment creation (DESeq2, WGCNA) can be slow on cold
-    # caches. Generous timeout avoids a misleading "stuck" run; if this is
-    # regularly exceeded, consider pre-building a container image instead of
-    # per-rule conda envs (see README "Future improvements").
     timeout-minutes: 45
+    defaults:
+      run:
+        shell: bash -l {0}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -54,4 +48,5 @@ jobs:
         with:
           name: pipeline-results
           path: results/
+          if-no-files-found: warn
           retention-days: 7
